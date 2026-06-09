@@ -2,6 +2,8 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { BottomNavBar } from "@/components/layout/BottomNavBar";
 
+export const dynamic = "force-dynamic";
+
 // (main) 그룹: 인증된 유저만 접근 가능한 페이지들
 export default async function MainLayout({
   children,

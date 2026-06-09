@@ -1,6 +1,8 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
+export const dynamic = "force-dynamic";
+
 // 루트 경로: 로그인 여부에 따라 분기
 export default async function RootPage() {
   const supabase = await createClient();
