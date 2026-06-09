@@ -1,6 +1,5 @@
 {
   "framework": "nextjs",
-  "regions": ["sin1", "icn1"],
   "headers": [
     {
       "source": "/(.*)",
