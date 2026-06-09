@@ -1,0 +1,59 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;700&display=swap');
+
+@layer base {
+  :root {
+    --safe-top: env(safe-area-inset-top);
+    --safe-bottom: env(safe-area-inset-bottom);
+  }
+
+  html {
+    /* 모바일 탭 하이라이트 제거 */
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    @apply bg-white text-gray-900 font-sans antialiased;
+    /* iOS 모멘텀 스크롤 */
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* 스크롤바 최소화 (모바일 느낌) */
+  ::-webkit-scrollbar {
+    width: 4px;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-gray-200 rounded-full;
+  }
+}
+
+@layer components {
+  /* 모바일 최대 너비 컨테이너 */
+  .mobile-container {
+    @apply max-w-[430px] mx-auto min-h-screen relative;
+  }
+
+  /* 채팅 메시지 버블 공통 스타일 */
+  .bubble-base {
+    @apply rounded-2xl px-4 py-2.5 text-sm leading-relaxed max-w-[75%] break-words;
+  }
+
+  .bubble-mine {
+    @apply bubble-base bg-primary text-white rounded-br-sm;
+  }
+
+  .bubble-others {
+    @apply bubble-base bg-gray-100 text-gray-900 rounded-bl-sm;
+  }
+
+  /* 시그널 배지 */
+  .signal-badge {
+    @apply inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full;
+  }
+}
