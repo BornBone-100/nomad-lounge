@@ -44,25 +44,41 @@ export default function OnboardPage() {
     setError("");
 
     try {
-      // 1. 익명 로그인 (이메일/비밀번호 없음 — Supabase 익명 인증)
+      // 1. 익명 로그인
       const { data: authData, error: authError } = await supabase.auth.signInAnonymously();
-      if (authError) throw authError;
+      if (authError) {
+        // 익명 로그인 비활성화된 경우 안내
+        if (authError.message?.includes("Anonymous") || authError.status === 422) {
+          setError("Supabase 대시보드에서 익명 로그인을 활성화해 주세요 (Authentication → Providers → Anonymous)");
+        } else {
+          setError(`로그인 오류: ${authError.message}`);
+        }
+        setIsLoading(false);
+        return;
+      }
 
       const userId = authData.user!.id;
       const detectedLang = detectLanguage();
 
-      // 2. 프로필 생성
+      // 2. 프로필 upsert (이미 존재하면 닉네임만 업데이트)
       const { data: profile, error: profileError } = await supabase
         .from("profiles")
-        .insert({
-          id: userId,
-          nickname: trimmed,
-          languages: [detectedLang],
-        })
+        .upsert(
+          {
+            id: userId,
+            nickname: trimmed,
+            languages: [detectedLang],
+          },
+          { onConflict: "id" }
+        )
         .select()
         .single();
 
-      if (profileError) throw profileError;
+      if (profileError) {
+        setError(`프로필 생성 오류: ${profileError.message}`);
+        setIsLoading(false);
+        return;
+      }
 
       // 3. 전역 스토어 업데이트
       setProfile(profile);
@@ -70,9 +86,10 @@ export default function OnboardPage() {
 
       // 4. 홈으로 이동
       router.replace("/home");
-    } catch (err) {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "알 수 없는 오류";
       console.error("Onboard error:", err);
-      setError("문제가 발생했어요. 다시 시도해 주세요.");
+      setError(`오류가 발생했어요: ${message}`);
       setIsLoading(false);
     }
   };
