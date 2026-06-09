@@ -9,6 +9,7 @@ import { createClient } from "@/lib/supabase/client";
 import { useUserStore } from "@/store/userStore";
 import { SignalStories } from "@/components/lounge/SignalStories";
 import { SignalFeedCard } from "@/components/lounge/SignalFeedCard";
+import { MatchRecommendations } from "@/components/lounge/MatchRecommendations";
 import { MessageFeed } from "@/components/lounge/MessageFeed";
 import { MessageInput } from "@/components/lounge/MessageInput";
 import { usePresence } from "@/hooks/usePresence";
@@ -138,6 +139,9 @@ export default function LoungePage() {
 
       {/* ── 시그널 스토리 (항상 노출) ── */}
       <SignalStories cityId={cityId} onUserClick={(id) => handleDM(id, "")} />
+
+      {/* ── 매칭 추천 (항상 노출) ── */}
+      <MatchRecommendations cityId={cityId} />
 
       {/* ── 탭 콘텐츠 ── */}
       {tab === "feed" ? (
