@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { X, MapPin, Clock, Send, Loader2 } from "lucide-react";
+import { X, MapPin, Clock, Send, Loader2, Map } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { MapProvider } from "@/components/map/MapProvider";
+import { MeetupLocationPicker } from "@/components/map/MeetupLocationPicker";
 
 interface MeetupProposalModalProps {
   proposerId: string;
@@ -25,10 +27,13 @@ export function MeetupProposalModal({
 }: MeetupProposalModalProps) {
   const supabase = createClient();
   const [place, setPlace] = useState("");
+  const [placeLat, setPlaceLat] = useState<number | null>(null);
+  const [placeLng, setPlaceLng] = useState<number | null>(null);
   const [meetAt, setMeetAt] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [showMap, setShowMap] = useState(false);
 
   const handleSubmit = async () => {
     if (!place.trim()) { setError("장소를 입력해주세요"); return; }
@@ -41,6 +46,8 @@ export function MeetupProposalModal({
       receiver_id: receiverId,
       city_id: cityId ?? null,
       place: place.trim(),
+      place_lat: placeLat,
+      place_lng: placeLng,
       meet_at: new Date(meetAt).toISOString(),
       message: message.trim() || null,
       status: "pending",
@@ -77,18 +84,40 @@ export function MeetupProposalModal({
         <div className="space-y-4">
           {/* 장소 */}
           <div>
-            <label className="text-xs font-semibold text-gray-600 mb-1.5 flex items-center gap-1.5">
-              <MapPin className="w-3.5 h-3.5 text-primary" />
-              만날 장소
-            </label>
-            <input
-              type="text"
-              placeholder="예) 카오산로드 스타벅스, 숙소 로비..."
-              value={place}
-              onChange={(e) => setPlace(e.target.value)}
-              className="w-full px-4 py-3 rounded-2xl bg-gray-50 border border-gray-200 text-sm
-                outline-none focus:border-primary focus:bg-white transition-all placeholder:text-gray-300"
-            />
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="text-xs font-semibold text-gray-600 flex items-center gap-1.5">
+                <MapPin className="w-3.5 h-3.5 text-primary" />
+                만날 장소
+              </label>
+              <button
+                type="button"
+                onClick={() => setShowMap((v) => !v)}
+                className="flex items-center gap-1 text-[11px] text-primary font-semibold active:opacity-70"
+              >
+                <Map className="w-3 h-3" />
+                {showMap ? "지도 닫기" : "지도로 선택"}
+              </button>
+            </div>
+            {showMap ? (
+              <MapProvider>
+                <MeetupLocationPicker
+                  onSelect={(name, lat, lng) => {
+                    setPlace(name);
+                    setPlaceLat(lat);
+                    setPlaceLng(lng);
+                  }}
+                />
+              </MapProvider>
+            ) : (
+              <input
+                type="text"
+                placeholder="예) 카오산로드 스타벅스, 숙소 로비..."
+                value={place}
+                onChange={(e) => setPlace(e.target.value)}
+                className="w-full px-4 py-3 rounded-2xl bg-gray-50 border border-gray-200 text-sm
+                  outline-none focus:border-primary focus:bg-white transition-all placeholder:text-gray-300"
+              />
+            )}
           </div>
 
           {/* 날짜/시간 */}

@@ -123,6 +123,30 @@ async def lounge_websocket(
                     "message": f"메시지가 커뮤니티 가이드라인에 위반됩니다. ({flag_reason})",
                 })
                 logger.warning(f"[Moderation] 차단: user={user_id} reason={flag_reason}")
+
+                # 위반 누적 + 임계치 초과 시 자동 탈퇴
+                from backend.services.termination import record_moderation_violation
+                result = await record_moderation_violation(
+                    db=db,
+                    user_id=user_id,
+                    message=content,
+                    categories=flag_reason.split(", "),
+                    lounge_id=lounge_id,
+                )
+                if result.get("terminated"):
+                    await websocket.send_json({
+                        "type": "terminated",
+                        "message": "커뮤니티 가이드라인 반복 위반으로 계정이 영구 정지되었습니다.",
+                    })
+                    await websocket.close(code=4403)
+                    return
+                else:
+                    remaining = 3 - result["violation_count"]
+                    if remaining > 0:
+                        await websocket.send_json({
+                            "type": "warning",
+                            "message": f"경고 {result['violation_count']}/3회. {remaining}회 더 위반 시 계정이 영구 정지됩니다.",
+                        })
                 continue
 
             # ── 3-3. 다국어 번역 ──────────────────────────────────────────

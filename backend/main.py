@@ -16,6 +16,7 @@ from models.report import Report  # noqa: F401
 # 라우터
 from routers.websocket import router as ws_router
 from routers.reports import router as reports_router
+from routers.admin import router as admin_router
 
 
 @asynccontextmanager
@@ -47,6 +48,7 @@ app.add_middleware(
 # 라우터 등록
 app.include_router(ws_router)       # WebSocket: /ws/lounge/{lounge_id}
 app.include_router(reports_router)  # REST: /api/reports, /api/praises, /api/users/{id}/trust
+app.include_router(admin_router)    # Admin: /api/admin/terminate/{user_id}
 
 
 @app.get("/health")

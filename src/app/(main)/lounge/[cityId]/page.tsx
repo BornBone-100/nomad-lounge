@@ -12,11 +12,13 @@ import { SignalFeedCard } from "@/components/lounge/SignalFeedCard";
 import { MatchRecommendations } from "@/components/lounge/MatchRecommendations";
 import { MessageFeed } from "@/components/lounge/MessageFeed";
 import { MessageInput } from "@/components/lounge/MessageInput";
+import { MapProvider } from "@/components/map/MapProvider";
+import { TravelerMap } from "@/components/map/TravelerMap";
 import { usePresence } from "@/hooks/usePresence";
 import { cn } from "@/lib/utils";
 import type { City, MessageWithProfile } from "@/types/database";
 
-type Tab = "feed" | "chat";
+type Tab = "feed" | "chat" | "map";
 
 export default function LoungePage() {
   const { cityId } = useParams<{ cityId: string }>();
@@ -120,7 +122,7 @@ export default function LoungePage() {
 
         {/* ── 탭 바 ── */}
         <div className="flex px-4 gap-4 border-t border-gray-100">
-          {(["feed", "chat"] as Tab[]).map((t) => (
+          {(["feed", "chat", "map"] as Tab[]).map((t) => (
             <button
               key={t}
               onClick={() => setTab(t)}
@@ -131,7 +133,7 @@ export default function LoungePage() {
                   : "text-gray-400 border-transparent"
               )}
             >
-              {t === "feed" ? "⚡ 실시간 번개 피드" : "💬 글로벌 채팅"}
+              {t === "feed" ? "⚡ 번개 피드" : t === "chat" ? "💬 글로벌 채팅" : "🗺️ 지도"}
             </button>
           ))}
         </div>
@@ -144,7 +146,7 @@ export default function LoungePage() {
       <MatchRecommendations cityId={cityId} />
 
       {/* ── 탭 콘텐츠 ── */}
-      {tab === "feed" ? (
+      {tab === "feed" && (
         <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3 pb-6">
           {feedMessages.length === 0 ? (
             <div className="text-center py-16">
@@ -160,11 +162,21 @@ export default function LoungePage() {
             ))
           )}
         </div>
-      ) : (
+      )}
+      {tab === "chat" && (
         <>
           <MessageFeed loungeId={loungeId} />
           <MessageInput loungeId={loungeId} />
         </>
+      )}
+      {tab === "map" && city && (
+        <MapProvider>
+          <TravelerMap
+            cityId={cityId}
+            cityLat={(city as any).latitude ?? 13.7563}
+            cityLng={(city as any).longitude ?? 100.5018}
+          />
+        </MapProvider>
       )}
     </div>
   );

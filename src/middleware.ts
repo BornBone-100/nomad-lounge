@@ -32,17 +32,38 @@ export async function middleware(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   const { pathname } = request.nextUrl;
 
-  // 미인증 상태에서 /home, /lounge, /profile 접근 시 → /onboard
-  if (!user && pathname.startsWith("/(main)") === false) {
-    const protectedPaths = ["/home", "/lounge", "/profile"];
+  // /banned 페이지는 항상 접근 허용
+  if (pathname === "/banned") return supabaseResponse;
+
+  // 미인증 상태에서 보호 경로 접근 시 → /onboard
+  if (!user) {
+    const protectedPaths = ["/home", "/lounge", "/profile", "/dm", "/notifications"];
     if (protectedPaths.some((p) => pathname.startsWith(p))) {
       return NextResponse.redirect(new URL("/onboard", request.url));
     }
+    return supabaseResponse;
   }
 
   // 인증 상태에서 /onboard 접근 시 → /home
-  if (user && pathname === "/onboard") {
+  if (pathname === "/onboard") {
     return NextResponse.redirect(new URL("/home", request.url));
+  }
+
+  // ── 탈퇴 유저 차단 ─────────────────────────────────────────────
+  // 보호 경로 접근 시에만 DB 조회 (모든 요청에서 하면 느려짐)
+  const protectedPaths = ["/home", "/lounge", "/profile", "/dm", "/notifications"];
+  if (protectedPaths.some((p) => pathname.startsWith(p))) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("status")
+      .eq("id", user.id)
+      .single();
+
+    if (profile?.status === "terminated") {
+      // 세션 삭제 후 차단 화면으로
+      await supabase.auth.signOut();
+      return NextResponse.redirect(new URL("/banned", request.url));
+    }
   }
 
   return supabaseResponse;
