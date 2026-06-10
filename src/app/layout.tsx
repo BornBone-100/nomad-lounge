@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import Script from "next/script";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -14,9 +15,9 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,        // 모바일 더블탭 줌 방지
+  maximumScale: 1,
   userScalable: false,
-  themeColor: "#6366F1",  // 브라우저 상단 바 컬러 (Android)
+  themeColor: "#6366F1",
 };
 
 export default function RootLayout({
@@ -24,9 +25,18 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const mapsKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? "";
+
   return (
     <html lang="ko">
       <body>
+        {/* Google Maps 스크립트 — 앱 전체에서 한 번만 로드 */}
+        {mapsKey && (
+          <Script
+            src={`https://maps.googleapis.com/maps/api/js?key=${mapsKey}&libraries=places,geometry&language=ko`}
+            strategy="beforeInteractive"
+          />
+        )}
         <div className="mobile-container">
           {children}
         </div>
