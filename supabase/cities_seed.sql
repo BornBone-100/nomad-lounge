@@ -3,6 +3,26 @@
 --  전 세계 솔로 여행자 핫플 20개 도시
 -- ════════════════════════════════════════════════════════
 
+-- ── 컬럼 없으면 추가 ──────────────────────────────────────
+ALTER TABLE cities ADD COLUMN IF NOT EXISTS name_ko        TEXT;
+ALTER TABLE cities ADD COLUMN IF NOT EXISTS country        TEXT;
+ALTER TABLE cities ADD COLUMN IF NOT EXISTS country_code   TEXT;
+ALTER TABLE cities ADD COLUMN IF NOT EXISTS emoji          TEXT;
+ALTER TABLE cities ADD COLUMN IF NOT EXISTS timezone       TEXT;
+ALTER TABLE cities ADD COLUMN IF NOT EXISTS traveler_count INT DEFAULT 0;
+
+-- ── name 컬럼 UNIQUE 제약 추가 (없으면) ──────────────────
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint
+    WHERE conname = 'cities_name_unique' AND conrelid = 'cities'::regclass
+  ) THEN
+    ALTER TABLE cities ADD CONSTRAINT cities_name_unique UNIQUE (name);
+  END IF;
+END $$;
+
+-- ── 데이터 삽입 ──────────────────────────────────────────
 INSERT INTO cities (name, name_ko, country, country_code, emoji, timezone, latitude, longitude, traveler_count)
 VALUES
   ('Bali',         '발리',        'Indonesia',     'ID', '🌴', 'Asia/Makassar',       -8.3405,   115.0920,  0),
@@ -36,11 +56,8 @@ ON CONFLICT (name) DO UPDATE SET
 
 
 -- ── 각 도시의 라운지(메인 채팅방) 자동 생성 ──────────────────
-INSERT INTO lounges (city_id, name, description)
-SELECT
-  c.id,
-  c.name_ko || ' 라운지',
-  c.emoji || ' ' || c.name_ko || '에 있는 여행자들의 실시간 대화방'
+INSERT INTO lounges (city_id, type)
+SELECT c.id, 'main'
 FROM cities c
 WHERE NOT EXISTS (
   SELECT 1 FROM lounges l WHERE l.city_id = c.id
