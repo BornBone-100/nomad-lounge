@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, MessageCircle, Bell, User } from "lucide-react";
+import { Home, Compass, Bell, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useNotifications } from "@/hooks/useNotifications";
 
@@ -11,10 +11,10 @@ export function BottomNavBar() {
   const { unreadCount } = useNotifications();
 
   const NAV_ITEMS = [
-    { href: "/home",          icon: Home,          label: "홈",    badge: 0 },
-    { href: "/lounge",        icon: MessageCircle, label: "라운지", badge: 0 },
-    { href: "/notifications", icon: Bell,          label: "알림",   badge: unreadCount },
-    { href: "/profile",       icon: User,          label: "프로필", badge: 0 },
+    { href: "/home",          icon: Home,    label: "홈",    badge: 0 },
+    { href: "/explore",       icon: Compass, label: "탐색",  badge: 0 },
+    { href: "/notifications", icon: Bell,    label: "알림",  badge: unreadCount },
+    { href: "/profile",       icon: User,    label: "프로필", badge: 0 },
   ];
 
   return (
