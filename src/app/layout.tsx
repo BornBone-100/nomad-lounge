@@ -5,10 +5,19 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "NomadLounge — 지금 이 도시의 여행자들과",
   description: "앱 설치 없이 도시를 선택하면 즉시 전 세계 여행자들과 연결되는 실시간 라운지",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "NomadLounge",
+  },
   openGraph: {
     title: "NomadLounge",
     description: "지금 이 도시의 여행자들과 실시간으로 어울리세요",
     type: "website",
+  },
+  icons: {
+    apple: "/icons/icon-192x192.png",
   },
 };
 

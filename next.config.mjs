@@ -1,10 +1,20 @@
+import withPWA from "next-pwa";
+
+const pwaConfig = withPWA({
+  dest: "public",
+  register: true,
+  skipWaiting: true,
+  disable: process.env.NODE_ENV === "development", // 개발 환경에서는 SW 비활성화
+  buildExcludes: [/middleware-manifest\.json$/],
+});
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   typescript: {
-    ignoreBuildErrors: true, // MVP 배포용 — 타입 에러 무시
+    ignoreBuildErrors: true,
   },
   eslint: {
-    ignoreDuringBuilds: true, // ESLint 경고도 무시
+    ignoreDuringBuilds: true,
   },
   images: {
     remotePatterns: [
@@ -16,4 +26,4 @@ const nextConfig = {
   },
 };
 
-export default nextConfig;
+export default pwaConfig(nextConfig);
