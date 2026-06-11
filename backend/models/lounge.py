@@ -12,6 +12,7 @@ from sqlmodel import SQLModel, Field, Relationship
 if TYPE_CHECKING:
     from .user_signal import UserSignal
     from .chat_message import ChatMessage
+    from .place import Place
 
 
 class LoungeBase(SQLModel):
@@ -33,6 +34,7 @@ class Lounge(LoungeBase, table=True):
     # Relationships (1:N)
     signals: List["UserSignal"] = Relationship(back_populates="lounge")
     messages: List["ChatMessage"] = Relationship(back_populates="lounge")
+    places: List["Place"] = Relationship(back_populates="lounge")
 
 
 # API 요청/응답용 Pydantic 스키마

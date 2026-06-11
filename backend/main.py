@@ -10,7 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from core.database import init_db
 
 # 모든 모델을 import해야 SQLModel이 테이블 생성 시 인식
-from models import User, Lounge, UserSignal, ChatMessage  # noqa: F401
+from models import User, Lounge, UserSignal, ChatMessage, Place  # noqa: F401
 from models.report import Report  # noqa: F401
 
 # 라우터
