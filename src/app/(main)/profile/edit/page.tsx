@@ -46,7 +46,7 @@ const COUNTRIES = [
 export default function ProfileEditPage() {
   const router = useRouter();
   const supabase = createClient();
-  const { profile } = useUserStore();
+  const { profile, setProfile } = useUserStore();
 
   const [bio, setBio] = useState("");
   const [checkIn, setCheckIn] = useState("");
@@ -92,16 +92,26 @@ export default function ProfileEditPage() {
   const handleSave = async () => {
     if (!profile?.id) return;
     setSaving(true);
-    await supabase.from("profiles").update({
+
+    const updates = {
       bio: bio.trim() || null,
       travel_style_tags: styleTags,
       visited_countries: visitedCountries,
       check_in_date: checkIn || null,
       check_out_date: checkOut || null,
-    }).eq("id", profile.id);
+    };
+
+    await supabase.from("profiles").update(updates).eq("id", profile.id);
+
+    // Zustand store 즉시 동기화 (새로고침 없이 반영)
+    setProfile({ ...profile, ...updates });
+
     setSaving(false);
     setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+    setTimeout(() => {
+      setSaved(false);
+      router.back();
+    }, 1200);
   };
 
   return (

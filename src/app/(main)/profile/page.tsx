@@ -147,6 +147,15 @@ export default function ProfilePage() {
         </div>
       </div>
 
+      {/* 프로필 편집 버튼 */}
+      <button
+        onClick={() => router.push("/profile/edit")}
+        className="flex items-center justify-center gap-2 w-full py-3 rounded-2xl text-sm font-semibold text-gray-700 bg-gray-50 border border-gray-200 hover:bg-gray-100 active:scale-[0.98] transition-all mb-4"
+      >
+        <Edit3 className="w-4 h-4" />
+        프로필 상세 편집 (소개 · 스타일 · 방문국)
+      </button>
+
       {/* 번역 언어 설정 */}
       <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-5 mb-4">
         <h3 className="text-sm font-bold text-gray-900 mb-3">🌐 번역 언어</h3>
