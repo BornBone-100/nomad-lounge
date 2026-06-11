@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useCallback, useRef, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { MapPin, Navigation, Filter, Search } from "lucide-react";
 import { GoogleMap, MarkerF, InfoWindowF } from "@react-google-maps/api";
@@ -42,7 +42,7 @@ const MAP_OPTIONS: google.maps.MapOptions = {
   ],
 };
 
-export default function ExplorePage() {
+function ExplorePageInner() {
   const router       = useRouter();
   const searchParams = useSearchParams();
   const supabase     = createClient();
@@ -399,5 +399,17 @@ export default function ExplorePage() {
         </BottomSheet>
       </div>
     </MapProvider>
+  );
+}
+
+export default function ExplorePage() {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center w-full h-screen bg-gray-100">
+        <div className="w-6 h-6 border-2 border-violet-500 border-t-transparent rounded-full animate-spin" />
+      </div>
+    }>
+      <ExplorePageInner />
+    </Suspense>
   );
 }
